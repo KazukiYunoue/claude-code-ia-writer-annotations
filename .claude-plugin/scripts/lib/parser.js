@@ -13,7 +13,8 @@ const { verifyHash } = require('./hash');
 function countGraphemes(text) {
   if (!text) return 0;
 
-  const segmenter = new Intl.Segmenter('en', { granularity: 'grapheme' });
+  // Use undefined locale to respect user's system locale for proper unicode handling
+  const segmenter = new Intl.Segmenter(undefined, { granularity: 'grapheme' });
   const segments = segmenter.segment(text);
   return Array.from(segments).length;
 }
@@ -26,7 +27,8 @@ function countGraphemes(text) {
  * @returns {string} Extracted text
  */
 function extractByGraphemeRange(text, start, length) {
-  const segmenter = new Intl.Segmenter('en', { granularity: 'grapheme' });
+  // Use undefined locale to respect user's system locale for proper unicode handling
+  const segmenter = new Intl.Segmenter(undefined, { granularity: 'grapheme' });
   const segments = Array.from(segmenter.segment(text));
 
   const startIndex = segments[start]?.index || 0;
@@ -61,13 +63,14 @@ function parseAnnotations(content) {
   }
 
   // Look for annotation block separator (---)
-  const separatorMatch = content.match(/\n---\s*\n(Annotations:.*?)$/s);
+  const separatorMatch = content.match(/\n\n---\n(Annotations:.*?)$/s);
 
   if (!separatorMatch) {
     // No annotations found
     return { text: content, annotations: {}, raw: null };
   }
 
+  // Extract text before the separator (excluding the newlines before ---)
   const textContent = content.substring(0, separatorMatch.index);
   const annotationBlock = separatorMatch[1];
 
