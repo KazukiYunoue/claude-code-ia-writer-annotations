@@ -52,22 +52,32 @@ function mergeRanges(ranges) {
 /**
  * Add author annotation to existing annotations
  * @param {Object} annotations - Existing annotations
- * @param {string} author - Author name (without @ prefix)
+ * @param {string} author - Author name (without @ or & prefix)
  * @param {Array<{start: number, length: number}>} ranges - New ranges
+ * @param {string} kind - Author kind: 'Human' or 'Other' (default: 'Other' for AI)
  * @returns {Object} Updated annotations
  */
-function addAuthorAnnotation(annotations, author, ranges) {
+function addAuthorAnnotation(annotations, author, ranges, kind = 'Other') {
   const updated = { ...annotations };
-  const authorKey = author.startsWith('@') ? author.substring(1) : author;
+
+  // Remove prefix if present
+  let authorName = author;
+  if (author.startsWith('@') || author.startsWith('&')) {
+    authorName = author.substring(1);
+  }
+
+  // Determine prefix based on kind
+  const prefix = kind === 'Human' ? '@' : '&';
+  const authorKey = `${prefix}${authorName}`;
 
   // Get existing ranges for this author
-  const existingRanges = updated[`@${authorKey}`] || [];
+  const existingRanges = updated[authorKey] || [];
 
   // Merge with new ranges
   const allRanges = [...existingRanges, ...ranges];
   const mergedRanges = mergeRanges(allRanges);
 
-  updated[`@${authorKey}`] = mergedRanges;
+  updated[authorKey] = mergedRanges;
 
   return updated;
 }
@@ -119,6 +129,9 @@ function generateAnnotationBlock(text, annotations) {
     }
   }
 
+  // Add end marker
+  lines.push('...');
+
   return lines.join('\n');
 }
 
@@ -135,7 +148,7 @@ function generateFileContent(text, annotations) {
     return text;
   }
 
-  return `${text}\n\n---\n${annotationBlock}\n`;
+  return `${text}\n\n---\n${annotationBlock}`;
 }
 
 /**

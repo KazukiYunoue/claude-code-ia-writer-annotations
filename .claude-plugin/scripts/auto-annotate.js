@@ -109,8 +109,9 @@ function annotateFile(filePath, toolName, toolInput) {
       return;
     }
 
-    // Add author annotation
-    const updatedAnnotations = addAuthorAnnotation(currentAnnotations, authorName, newRanges);
+    // Add author annotation with kind from config
+    const authorKind = config.authorKind;
+    const updatedAnnotations = addAuthorAnnotation(currentAnnotations, authorName, newRanges, authorKind);
 
     // Generate new file content with annotations
     const newContent = generateFileContent(currentText, updatedAnnotations);

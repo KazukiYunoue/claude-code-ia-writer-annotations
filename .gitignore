@@ -1,0 +1,9 @@
+# Generated annotation test files
+test/*-annotated.md
+test/*-annotated.txt
+
+# Node modules (if added in future)
+node_modules/
+
+# OS files
+.DS_Store
