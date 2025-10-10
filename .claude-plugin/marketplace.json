@@ -1,0 +1,15 @@
+{
+  "name": "iA Writer Annotations Marketplace",
+  "description": "Claude Code plugin for iA Writer authorship annotations",
+  "plugins": [
+    {
+      "name": "ia-writer-annotations",
+      "description": "Automatically add iA Writer authorship annotations to your text files when Claude Code edits them",
+      "author": "Kazuki Yunoue",
+      "version": "1.0.0",
+      "homepage": "https://github.com/KazukiYunoue/claude-code-ia-writer-annotations",
+      "source": "https://github.com/KazukiYunoue/claude-code-ia-writer-annotations.git",
+      "tags": ["iA Writer", "annotations", "authorship", "markdown", "text"]
+    }
+  ]
+}

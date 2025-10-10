@@ -1,0 +1,19 @@
+{
+  "name": "ia-writer-annotations",
+  "version": "1.0.0",
+  "description": "Automatically add iA Writer authorship annotations to your text files when Claude Code edits them",
+  "author": "Kazuki Yunoue",
+  "homepage": "https://github.com/KazukiYunoue/claude-code-ia-writer-annotations",
+  "config": {
+    "authorName": "Claude",
+    "authorKind": "Other"
+  },
+  "commands": [
+    "commands/annotate.md",
+    "commands/show-authors.md",
+    "commands/remove-annotations.md"
+  ],
+  "hooks": [
+    "hooks/hooks.json"
+  ]
+}
