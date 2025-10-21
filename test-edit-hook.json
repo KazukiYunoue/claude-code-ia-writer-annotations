@@ -1,0 +1,10 @@
+{
+  "tool": {
+    "name": "Edit",
+    "input": {
+      "file_path": "/home/user/claude-code-ia-writer-annotations/test-existing.md",
+      "old_string": "既存のファイルです。\n\nこれは元々あった内容です。",
+      "new_string": "既存のファイルです。\n\nこれは元々あった内容です。\n\n新しい段落を追加します。この段落にはいくつかの日本語の文章が含まれています。ひらがな、カタカナ、漢字を使用しています。絵文字も追加してみましょう：✨ 🎯 📖\n\nさらにもう一段落追加します。Claude Codeは優れたツールで、プログラミングやドキュメント作成を効率的に行うことができます。"
+    }
+  }
+}
