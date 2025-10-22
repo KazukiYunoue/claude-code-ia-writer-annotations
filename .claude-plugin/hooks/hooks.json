@@ -1,4 +1,5 @@
 {
+  "description": "Automatically add iA Writer annotations to edited files",
   "hooks": {
     "PostToolUse": [
       {
