@@ -131,8 +131,13 @@ function annotateFile(filePath, toolName, toolInput) {
  */
 function main() {
   try {
+    // Log that script is running
+    const logPath = '/tmp/ia-writer-annotations-debug.log';
+    fs.appendFileSync(logPath, `[${new Date().toISOString()}] Script started\n`);
+
     // Read hook input from stdin
     const input = fs.readFileSync(0, 'utf8');
+    fs.appendFileSync(logPath, `[${new Date().toISOString()}] Input: ${input}\n`);
     const hookData = JSON.parse(input);
 
     // Extract tool information
