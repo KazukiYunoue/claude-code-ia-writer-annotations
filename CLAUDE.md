@@ -185,6 +185,83 @@ Test the following in Terminal Claude Code:
 - [ ] Custom file extension support
 - [ ] Annotation statistics display
 
+## Implementation Strategy: Incremental Edit Tracking
+
+### Current Status (v0.2.0)
+
+Files with existing annotations are completely skipped to avoid incorrect attribution.
+
+### Planned Approach: Using structuredPatch
+
+PostToolUse hook provides `tool_response.structuredPatch` which contains precise line-level diff information:
+
+```javascript
+{
+  "structuredPatch": [{
+    "oldStart": 140,      // Starting line in original file
+    "oldLines": 9,        // Number of lines in original
+    "newStart": 140,      // Starting line in new file
+    "newLines": 9,        // Number of lines in new file
+    "lines": [...]        // Diff-style lines (with +/- prefixes)
+  }]
+}
+```
+
+### Implementation Plan
+
+**Phase 1: Basic Patch-Based Tracking**
+1. Parse `structuredPatch` from `tool_response`
+2. Convert line numbers to character positions (grapheme-based)
+3. Calculate ranges for new/modified content
+4. Merge with existing author annotations
+
+**Phase 2: Edge Cases**
+1. Handle multiple patches in single edit
+2. Handle deletions (no annotation needed)
+3. Handle insertions vs modifications
+
+**Phase 3: Integration**
+1. Update `annotateFile()` in auto-annotate.js
+2. Add helper functions for line→char conversion
+3. Test with files containing existing annotations
+
+### Key Design Decisions
+
+**Why structuredPatch over string matching:**
+- ✅ Precise line-level position information
+- ✅ Handles multiple changes in single edit
+- ✅ No ambiguity with duplicate strings
+- ✅ Works with consecutive edits
+
+**Line to Character Position Conversion:**
+```javascript
+// Convert line number to grapheme position
+function lineToCharPosition(text, lineNumber) {
+  const lines = text.split('\n');
+  let position = 0;
+  for (let i = 0; i < lineNumber && i < lines.length; i++) {
+    position += countGraphemes(lines[i]) + 1; // +1 for newline
+  }
+  return position;
+}
+```
+
+**Handling Multiple Authors:**
+```markdown
+---
+Annotations: 0,270 SHA-256 ...
+@Claude: 0,134 150,50    ← Discontinuous ranges
+@Kazuki Yunoue: 134,16
+...
+```
+
+### Testing Strategy
+
+1. **Simple Edit**: Add text to file with existing annotations
+2. **Multiple Edits**: Sequential edits in same session
+3. **Mixed Authorship**: File with both human and AI annotations
+4. **Edge Cases**: Empty edits, deletions, line-only changes
+
 ## References
 
 - [iA Writer Markdown Annotations Specification](https://github.com/iainc/Markdown-Annotations)
