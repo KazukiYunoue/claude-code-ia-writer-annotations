@@ -8,15 +8,15 @@
   "plugins": [
     {
       "name": "ia-writer-annotations",
-      "description": "Automatically add iA Writer authorship annotations to your text files when Claude Code edits them",
+      "description": "Automatically add iA Writer authorship annotations to your text files when Claude Code edits them (Terminal version only)",
       "author": {
         "name": "Kazuki Yunoue",
         "url": "https://github.com/KazukiYunoue"
       },
-      "version": "0.1.4",
+      "version": "0.2.0",
       "homepage": "https://github.com/KazukiYunoue/claude-code-ia-writer-annotations",
       "source": "./.claude-plugin",
-      "tags": ["iA Writer", "annotations", "authorship", "markdown", "text"]
+      "tags": ["iA Writer", "annotations", "authorship", "markdown", "text", "terminal"]
     }
   ]
 }

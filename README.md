@@ -1,5 +1,7 @@
 # iA Writer Annotations Plugin for Claude Code
 
+> **⚠️ Terminal Version Only**: This plugin currently only works with the **terminal version** of Claude Code. The VSCode extension does not support PostToolUse hooks that modify files.
+
 Automatically add authorship annotations to your text files when Claude Code edits them, using the [iA Writer Markdown Annotations](https://github.com/iainc/Markdown-Annotations) open format.
 
 ## Overview
@@ -13,11 +15,6 @@ This plugin tracks Claude's contributions to your markdown and text files by aut
 - Tracks character ranges of Claude's contributions
 - Validates annotations with SHA-256 hash
 - Works seamlessly in the background - no manual intervention required
-
-### 📝 Manual Commands
-- `/annotate [author]` - Manually add authorship annotations
-- `/show-authors [file]` - Display authorship information for a file
-- `/remove-annotations [file]` - Remove all annotations (useful before exporting)
 
 ### ⚙️ Configurable
 - Default author name: `@Claude`
@@ -84,44 +81,6 @@ Hello, world!
 ---
 Annotations: 0,13 SHA-256 a948904f2f0f479b8f8197694b30184b0d2ed1c1cd2a1ec0fb85d299a192a447
 @Claude: 0,13
-```
-
-### Manual Commands
-
-#### `/annotate [author]`
-
-Manually add authorship annotations to a file:
-
-```bash
-# Annotate with default author (Claude)
-/annotate
-
-# Annotate with custom author name
-/annotate ChatGPT
-```
-
-#### `/show-authors [file]`
-
-Display authorship information for a file:
-
-```bash
-/show-authors document.md
-```
-
-Output example:
-```
-Authorship for document.md:
-- @Claude: 245 characters (38.5%)
-- @Human: 391 characters (61.5%)
-Total: 636 characters
-```
-
-#### `/remove-annotations [file]`
-
-Remove all annotations from a file (useful before exporting):
-
-```bash
-/remove-annotations document.md
 ```
 
 ### Enable/Disable Plugin
@@ -201,9 +160,16 @@ This ensures annotations remain valid across different environments and text enc
 
 ## Limitations
 
-### Current Limitations
+### Platform Compatibility
 
-**Incremental Edit Tracking Not Supported**
+**Terminal Version Only**
+
+The plugin currently only works with the **terminal version** of Claude Code. The VSCode extension does not support PostToolUse hooks that modify files, which are essential for automatic annotation functionality.
+
+- ✅ **Claude Code (Terminal)**: Fully supported
+- ❌ **Claude Code (VSCode Extension)**: Not supported
+
+### Incremental Edit Tracking
 
 The plugin currently does not track incremental edits to files that already have annotations. This means:
 
@@ -213,8 +179,6 @@ The plugin currently does not track incremental edits to files that already have
 
 When Claude edits a file that already contains annotations (indicating human or previous AI contributions), the plugin conservatively skips auto-annotation to avoid incorrectly attributing human-written content to Claude.
 
-**Workaround**: Use the `/annotate` command to manually add annotations after edits to existing annotated files.
-
 **Future Enhancement**: A future version may implement proper diff tracking to accurately annotate only the changed portions of files with existing annotations.
 
 ## Technical Details
@@ -223,21 +187,13 @@ When Claude edits a file that already contains annotations (indicating human or 
 
 ```
 .claude-plugin/
-├── plugin.json              # Plugin metadata and configuration
-├── commands/
-│   ├── annotate.md         # Manual annotation command
-│   ├── show-authors.md     # Display authorship info
-│   └── remove-annotations.md
-├── hooks/
-│   └── hooks.json          # PostToolUse hook configuration
+├── plugin.json           # Plugin metadata and configuration
 └── scripts/
-    ├── auto-annotate.js    # Automatic annotation logic
-    ├── manual-annotate.js  # Manual annotation handler
-    ├── show-authors.js     # Authorship display
+    ├── auto-annotate.js # Automatic annotation logic
     └── lib/
-        ├── parser.js       # Annotation parsing
-        ├── generator.js    # Annotation generation
-        └── hash.js         # SHA-256 calculation
+        ├── parser.js    # Annotation parsing
+        ├── generator.js # Annotation generation
+        └── hash.js      # SHA-256 calculation
 ```
 
 ### Dependencies
