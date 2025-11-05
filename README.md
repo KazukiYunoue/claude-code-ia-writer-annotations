@@ -199,6 +199,24 @@ The plugin uses JavaScript's `Intl.Segmenter` API to correctly count grapheme cl
 
 This ensures annotations remain valid across different environments and text encodings.
 
+## Limitations
+
+### Current Limitations
+
+**Incremental Edit Tracking Not Supported**
+
+The plugin currently does not track incremental edits to files that already have annotations. This means:
+
+- ✅ **New files created by Claude** (`Write` tool): Fully annotated
+- ✅ **Files without existing annotations** (`Edit` tool): Fully annotated
+- ❌ **Files with existing annotations** (`Edit` tool): Not updated
+
+When Claude edits a file that already contains annotations (indicating human or previous AI contributions), the plugin conservatively skips auto-annotation to avoid incorrectly attributing human-written content to Claude.
+
+**Workaround**: Use the `/annotate` command to manually add annotations after edits to existing annotated files.
+
+**Future Enhancement**: A future version may implement proper diff tracking to accurately annotate only the changed portions of files with existing annotations.
+
 ## Technical Details
 
 ### Directory Structure
