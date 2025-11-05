@@ -140,9 +140,9 @@ function main() {
     fs.appendFileSync(logPath, `[${new Date().toISOString()}] Input: ${input}\n`);
     const hookData = JSON.parse(input);
 
-    // Extract tool information
-    const toolName = hookData.tool?.name;
-    const toolInput = hookData.tool?.input;
+    // Extract tool information (support both formats)
+    const toolName = hookData.tool_name || hookData.tool?.name;
+    const toolInput = hookData.tool_input || hookData.tool?.input;
 
     // Only process Write and Edit tools
     if (!toolName || !['Write', 'Edit'].includes(toolName)) {

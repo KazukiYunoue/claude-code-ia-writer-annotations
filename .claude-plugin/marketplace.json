@@ -13,7 +13,7 @@
         "name": "Kazuki Yunoue",
         "url": "https://github.com/KazukiYunoue"
       },
-      "version": "0.1.2",
+      "version": "0.1.3",
       "homepage": "https://github.com/KazukiYunoue/claude-code-ia-writer-annotations",
       "source": "./.claude-plugin",
       "tags": ["iA Writer", "annotations", "authorship", "markdown", "text"]
