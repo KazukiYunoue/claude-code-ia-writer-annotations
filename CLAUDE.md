@@ -180,20 +180,58 @@ Test the following in Terminal Claude Code:
 
 ## Future Enhancement Ideas
 
-- [ ] Diff tracking for files with existing annotations
+- [ ] Incremental edit tracking (see challenges below)
 - [ ] VSCode extension support (requires resolving technical constraints)
 - [ ] Custom file extension support
 - [ ] Annotation statistics display
 
-## Implementation Strategy: Incremental Edit Tracking
+## Implementation Notes: Incremental Edit Tracking
 
 ### Current Status (v0.2.0)
 
 Files with existing annotations are completely skipped to avoid incorrect attribution.
 
-### Planned Approach: Using structuredPatch
+### Why Incremental Tracking Was Deferred
 
-PostToolUse hook provides `tool_response.structuredPatch` which contains precise line-level diff information:
+A v0.3.0 implementation using `structuredPatch` was attempted but deferred due to complexity:
+
+**What Works:**
+- ✅ Line additions (new lines appended to file)
+- ✅ Line-to-grapheme position conversion
+- ✅ Preserving existing author annotations
+
+**What Doesn't Work:**
+- ❌ In-line modifications (e.g., replacing "great!" with "perfect!")
+  - `structuredPatch` provides line-level diffs, not character-level
+  - When a word is replaced, the entire line is marked as changed
+  - This incorrectly attributes the whole line to Claude, not just the changed word
+
+**Example of the Problem:**
+```
+Original: "1. Auto-annotation when Claude writes great!"
+Changed:  "1. Auto-annotation when Claude writes perfect!"
+
+structuredPatch shows:
+- 1. Auto-annotation when Claude writes great!
++ 1. Auto-annotation when Claude writes perfect!
+
+Current implementation would attribute the entire line to Claude,
+but only "perfect!" should be attributed (replacing "great!").
+```
+
+### Required for Proper Implementation
+
+To correctly handle in-line modifications, we would need:
+
+1. **Character-level diff algorithm** (e.g., Myers diff, Levenshtein-based)
+2. **Compare old line vs new line** to find exact change positions
+3. **Map character positions** within the changed portion only
+
+This significantly increases complexity and is deferred for future consideration.
+
+### Technical Reference: structuredPatch Format
+
+PostToolUse hook provides `tool_response.structuredPatch`:
 
 ```javascript
 {
@@ -206,61 +244,6 @@ PostToolUse hook provides `tool_response.structuredPatch` which contains precise
   }]
 }
 ```
-
-### Implementation Plan
-
-**Phase 1: Basic Patch-Based Tracking**
-1. Parse `structuredPatch` from `tool_response`
-2. Convert line numbers to character positions (grapheme-based)
-3. Calculate ranges for new/modified content
-4. Merge with existing author annotations
-
-**Phase 2: Edge Cases**
-1. Handle multiple patches in single edit
-2. Handle deletions (no annotation needed)
-3. Handle insertions vs modifications
-
-**Phase 3: Integration**
-1. Update `annotateFile()` in auto-annotate.js
-2. Add helper functions for line→char conversion
-3. Test with files containing existing annotations
-
-### Key Design Decisions
-
-**Why structuredPatch over string matching:**
-- ✅ Precise line-level position information
-- ✅ Handles multiple changes in single edit
-- ✅ No ambiguity with duplicate strings
-- ✅ Works with consecutive edits
-
-**Line to Character Position Conversion:**
-```javascript
-// Convert line number to grapheme position
-function lineToCharPosition(text, lineNumber) {
-  const lines = text.split('\n');
-  let position = 0;
-  for (let i = 0; i < lineNumber && i < lines.length; i++) {
-    position += countGraphemes(lines[i]) + 1; // +1 for newline
-  }
-  return position;
-}
-```
-
-**Handling Multiple Authors:**
-```markdown
----
-Annotations: 0,270 SHA-256 ...
-@Claude: 0,134 150,50    ← Discontinuous ranges
-@Kazuki Yunoue: 134,16
-...
-```
-
-### Testing Strategy
-
-1. **Simple Edit**: Add text to file with existing annotations
-2. **Multiple Edits**: Sequential edits in same session
-3. **Mixed Authorship**: File with both human and AI annotations
-4. **Edge Cases**: Empty edits, deletions, line-only changes
 
 ## References
 
